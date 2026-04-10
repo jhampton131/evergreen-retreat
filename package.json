@@ -1,0 +1,10 @@
+{
+  "name": "evergreen-retreat",
+  "version": "1.0.0",
+  "dependencies": {
+    "stripe": "^14.0.0"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^2.0.0"
+  }
+}
