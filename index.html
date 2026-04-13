@@ -567,7 +567,7 @@ footer{background:#0D1810;padding:52px 40px;text-align:center}
           <span class="price-label">retreat ticket</span>
         </div>
         <div class="price-lodging">+ Lodging from $100 &ndash; $400</div>
-        <div class="price-deposit">$150 deposit holds your spot &middot; Remaining balance charged May 29, 2026</div>
+        <div class="price-deposit">Full $400 ticket + bed deposit due today &middot; Bed balance charged May 29, 2026</div>
       </div>
       <button class="btn-gold" id="infoRegBtn" onclick="openModal()" style="align-self:flex-start;padding:14px 36px;font-size:12px;letter-spacing:.1em;text-transform:uppercase">Reserve Your Spot</button>
     </div>
@@ -713,7 +713,7 @@ footer{background:#0D1810;padding:52px 40px;text-align:center}
     <h2 class="cta-title">Come be<br/><em>Evergreen</em></h2>
     <p class="cta-body">You don&#8217;t need to have it all together. You just need to show up. We&#8217;ll meet you there &mdash; at the lake, at the table, in His presence.</p>
     <button class="btn-gold" onclick="openModal()" style="padding:16px 52px;font-size:12px;letter-spacing:.12em;text-transform:uppercase">Register for Evergreen Summer</button>
-    <p class="cta-note">$150 deposit holds your spot &middot; Balance charged May 29 &middot; Reminder sent May 26</p>
+    <p class="cta-note">Full $400 ticket + bed deposit due today &middot; Bed balance charged May 29 &middot; Reminder sent May 26</p>
   </div>
 </section>
 
@@ -920,7 +920,7 @@ document.getElementById('modalOverlay').addEventListener('click',e=>{
 function calcTotals(){
   const bed=BEDS.find(b=>b.id===selBed);
   const bp=bed?bed.price:0,bd=bed?bed.dep:0;
-  return{bed,today:150+bd,total:400+bp,bal:(400+bp)-(150+bd)};
+  return{bed,today:400+bd,total:400+bp,bal:bp-bd};
 }
 function stepsHTML(){
   return['Ticket','Lodging','Your Info','Payment'].map((l,i)=>{
@@ -943,11 +943,11 @@ function renderModal(){
       <div class="ticket selected">
         <div class="ticket-h">
           <div><div class="ticket-name">Evergreen Summer Ticket</div><div style="font-size:11px;color:var(--sg);margin-top:2px">All sessions, meals &amp; programming</div></div>
-          <div style="text-align:right"><div class="ticket-price-big">$400</div><div class="ticket-dep">or $150 deposit today</div></div>
+          <div style="text-align:right"><div class="ticket-price-big">$400</div><div class="ticket-dep">full ticket due today</div></div>
         </div>
         <div class="ticket-pills">${['June 12–14, 2026','Granite Shoals TX','Lake LBJ','Infinity Pool','All Meals','All Sessions'].map(t=>`<span class="ticket-pill">${t}</span>`).join('')}</div>
       </div>
-      <div class="split-note"><strong style="color:var(--f);display:block;margin-bottom:3px">Split Payment Available</strong>Pay $150 today to hold your spot. Remaining balance auto-charged May 29, 2026 — reminder sent May 26.</div>
+      <div class="split-note"><strong style="color:var(--f);display:block;margin-bottom:3px">How Payment Works</strong>Full $400 retreat ticket + your bed deposit are due today. Remaining bed balance auto-charged May 29, 2026 — reminder sent May 26.</div>
       <div class="modal-nav"><span></span><button class="btn-forest" onclick="step=2;renderModal()">Choose Lodging →</button></div>`;
   }
   else if(step===2){

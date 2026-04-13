@@ -62,22 +62,36 @@ async function handleDepositSuccess(pi) {
       <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;padding:32px;background:#F9F5EE;border-radius:12px">
         <h2 style="color:#2D4A35;font-weight:300;margin-bottom:4px">New Booking</h2>
         <p style="color:#6B8C6E;font-size:13px;margin-bottom:28px;letter-spacing:.08em;text-transform:uppercase">Evergreen Summer 2026</p>
-
         <table style="width:100%;border-collapse:collapse;font-size:15px">
           <tr><td style="padding:8px 0;color:#9E9589;width:140px">Name</td><td style="color:#1C2B1F;font-weight:500">${firstName} ${lastName}</td></tr>
           <tr><td style="padding:8px 0;color:#9E9589">Email</td><td style="color:#1C2B1F">${email}</td></tr>
           <tr><td style="padding:8px 0;color:#9E9589">Lodging</td><td style="color:#1C2B1F">${bedName}</td></tr>
-          <tr><td style="padding:8px 0;color:#9E9589">Deposit Paid</td><td style="color:#2D4A35;font-weight:500">$${depositAmount}</td></tr>
+          <tr><td style="padding:8px 0;color:#9E9589">Paid Today</td><td style="color:#2D4A35;font-weight:500">$${depositAmount}</td></tr>
           <tr><td style="padding:8px 0;color:#9E9589">Balance Due</td><td style="color:#1C2B1F">$${balance}</td></tr>
           <tr><td style="padding:8px 0;color:#9E9589">Charge Date</td><td style="color:#1C2B1F">${chargeDateFmt}</td></tr>
           <tr><td style="padding:8px 0;color:#9E9589">Autopay</td><td style="color:#1C2B1F">${autopay === 'true' ? '✅ Enabled' : '❌ Manual'}</td></tr>
         </table>
-
         <div style="margin-top:28px;padding:16px;background:#EDE5D4;border-radius:8px;font-size:13px;color:#9E9589">
-          View full details in your <a href="https://dashboard.stripe.com/payments/${pi.id}" style="color:#2D4A35">Stripe dashboard</a>
+          View in <a href="https://dashboard.stripe.com/payments/${pi.id}" style="color:#2D4A35">Stripe dashboard</a>
         </div>
       </div>
     `,
+    // Google Sheets row data
+    sheetData: {
+      firstName,
+      lastName,
+      email,
+      phone:        pi.metadata?.phone || '',
+      church:       pi.metadata?.church || '',
+      bedType:      bedName,
+      paidToday:    depositAmount,
+      balanceDue:   balance,
+      totalAmount:  pi.metadata?.totalAmount || '',
+      chargeDate:   chargeDateFmt,
+      autopay:      autopay === 'true' ? 'Yes' : 'No',
+      stripeId:     pi.id,
+      registeredAt: new Date().toLocaleDateString('en-US'),
+    },
   });
 
   // 2. Send confirmation email to attendee

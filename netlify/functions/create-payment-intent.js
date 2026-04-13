@@ -1,9 +1,8 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-const TICKET_PRICE    = 400;
-const DEPOSIT_AMOUNT  = 150;
-const MAX_TICKETS     = 30;
-const EVENT_DATE      = new Date('2026-06-12T09:00:00-05:00');
+const TICKET_PRICE   = 400;  // full retreat ticket — paid upfront always
+const MAX_TICKETS    = 30;
+const EVENT_DATE     = new Date('2026-06-12T09:00:00-05:00');
 
 const CHARGE_DATE = new Date(EVENT_DATE);
 CHARGE_DATE.setDate(CHARGE_DATE.getDate() - 14);
@@ -57,9 +56,9 @@ exports.handler = async (event) => {
     }
 
     const bed = BED_PRICES[bedType];
-    const totalAmount   = (TICKET_PRICE + bed.price) * 100;      // in cents
-    const depositAmount = (DEPOSIT_AMOUNT + bed.deposit) * 100;   // in cents
-    const balanceAmount = totalAmount - depositAmount;
+    const totalAmount   = (TICKET_PRICE + bed.price) * 100;       // full ticket + full bed in cents
+    const depositAmount = (TICKET_PRICE + bed.deposit) * 100;     // full ticket + bed deposit in cents
+    const balanceAmount = totalAmount - depositAmount;             // remaining bed balance only
 
     // ── Create Stripe Customer ───────────────────────
     const customer = await stripe.customers.create({
