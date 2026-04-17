@@ -646,11 +646,11 @@ footer{background:#0D1810;padding:52px 40px;text-align:center}
     <h2 class="sec-title">Choose your <em>space</em></h2>
     <p class="sec-body">The home sleeps everyone on-site. Bathrooms are community-style, giving everyone flexibility.</p>
     <p style="font-size:15px;color:var(--f);margin-top:16px;margin-bottom:44px;font-weight:400;line-height:1.7;background:rgba(45,74,53,.06);border-left:3px solid var(--ms);border-radius:0 10px 10px 0;padding:14px 20px">&#42; <strong>King rooms:</strong> the $400 covers the bed &mdash; split with a friend or stay solo. All lodging options require a retreat ticket.</p>
-    <div class="lodging-grid">
-      <div class="lodge-card"><div class="lodge-icon">&#x1F6CF;</div><div class="lodge-name">Twin Bunk</div><div class="lodge-desc">Cozy twin bunk in a shared room. Bedding provided.</div><div class="lodge-price">+$100</div><div class="lodge-dep">or $40 deposit</div><div class="lodge-badge">9 Available</div></div>
-      <div class="lodge-card"><div class="lodge-icon">&#x1F6CF;</div><div class="lodge-name">Double (Shared)</div><div class="lodge-desc">Double bunk bottom in a shared space.</div><div class="lodge-price">+$150</div><div class="lodge-dep">or $50 deposit</div><div class="lodge-badge">1 Available</div></div>
-      <div class="lodge-card"><div class="lodge-icon">&#x1F6AA;</div><div class="lodge-name">Double (Private)</div><div class="lodge-desc">Double bed in its own private room.</div><div class="lodge-price">+$200</div><div class="lodge-dep">or $75 deposit</div><div class="lodge-badge">1 Available</div></div>
-      <div class="lodge-card"><div class="lodge-icon">&#x1F451;</div><div class="lodge-name">King Room</div><div class="lodge-desc">King room &mdash; cost covers the bed. Split or stay solo.</div><div class="lodge-price">+$400</div><div class="lodge-dep">or $150 deposit</div><div class="lodge-badge">2 Available</div></div>
+    <div class="lodging-grid" id="lodgingGrid">
+      <div class="lodge-card"><div class="lodge-icon">&#x1F6CF;</div><div class="lodge-name">Twin Bunk</div><div class="lodge-desc">Cozy twin bunk in a shared room. Bedding provided.</div><div class="lodge-price">+$100</div><div class="lodge-dep">or $40 deposit</div><div class="lodge-badge" id="badge-twin">9 Available</div></div>
+      <div class="lodge-card"><div class="lodge-icon">&#x1F6CF;</div><div class="lodge-name">Double (Shared)</div><div class="lodge-desc">Double bunk bottom in a shared space.</div><div class="lodge-price">+$150</div><div class="lodge-dep">or $50 deposit</div><div class="lodge-badge" id="badge-double">1 Available</div></div>
+      <div class="lodge-card"><div class="lodge-icon">&#x1F6AA;</div><div class="lodge-name">Double (Private)</div><div class="lodge-desc">Double bed in its own private room.</div><div class="lodge-price">+$200</div><div class="lodge-dep">or $75 deposit</div><div class="lodge-badge" id="badge-dbl_pvt" style="background:rgba(192,57,43,.1);color:#c0392b">Sold Out</div></div>
+      <div class="lodge-card"><div class="lodge-icon">&#x1F451;</div><div class="lodge-name">King Room</div><div class="lodge-desc">King room &mdash; cost covers the bed. Split or stay solo.</div><div class="lodge-price">+$400</div><div class="lodge-dep">or $150 deposit</div><div class="lodge-badge" id="badge-king">2 Available</div></div>
       <div class="lodge-card"><div class="lodge-icon">&#x1F3E0;</div><div class="lodge-name">No Accommodation</div><div class="lodge-desc">Commuting or staying off-site.</div><div class="lodge-price" style="font-size:15px;color:var(--sg)">No charge</div></div>
     </div>
   </div>
@@ -850,7 +850,7 @@ let cardElement    = null;
 // ── TICKET COUNTER ────────────────────────────────────
 let ticketsRemaining = MAX_TICKETS;
 let isSoldOut = false;
-let bedInventory = {twin:9, double:1, dbl_pvt:1, king:2, none:99};
+let bedInventory = {twin:9, double:1, dbl_pvt:0, king:2, none:99};
 
 async function loadTicketCount() {
   try {
@@ -888,6 +888,36 @@ function updateCounterUI(remaining, soldOut) {
     dot.className='hero-counter-dot';
     text.textContent=`${remaining} of ${MAX_TICKETS} spots available`;
   }
+
+  // Update lodging badges dynamically
+  updateLodgingBadges();
+}
+
+function updateLodgingBadges() {
+  const beds = [
+    { id:'twin',    label:'Twin Bunk',       max:9 },
+    { id:'double',  label:'Double (Shared)',  max:1 },
+    { id:'dbl_pvt', label:'Double (Private)', max:1 },
+    { id:'king',    label:'King Room',        max:2 },
+  ];
+  beds.forEach(b => {
+    const badge = document.getElementById(`badge-${b.id}`);
+    if (!badge) return;
+    const avail = bedInventory[b.id] !== undefined ? bedInventory[b.id] : b.max;
+    if (avail <= 0) {
+      badge.textContent = 'Sold Out';
+      badge.style.background = 'rgba(192,57,43,.1)';
+      badge.style.color = '#c0392b';
+    } else if (avail === 1) {
+      badge.textContent = '1 Available';
+      badge.style.background = 'rgba(196,164,90,.12)';
+      badge.style.color = '#8B6E2A';
+    } else {
+      badge.textContent = `${avail} Available`;
+      badge.style.background = 'rgba(196,164,90,.12)';
+      badge.style.color = '#8B6E2A';
+    }
+  });
 }
 
 // Try to load count — non-blocking, silently fails locally
