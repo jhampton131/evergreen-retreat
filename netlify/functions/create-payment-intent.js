@@ -68,6 +68,7 @@ exports.handler = async (event) => {
       metadata: {
         firstName,
         lastName,
+        phone:         phone || '',
         church:        church || '',
         bedType,
         bedName:       bed.name,
@@ -95,6 +96,7 @@ exports.handler = async (event) => {
         firstName,
         lastName,
         email,
+        phone:         phone || '',
         bedType,
         bedName:       bed.name,
         balanceAmount: (balanceAmount / 100).toString(),
