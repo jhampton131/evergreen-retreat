@@ -830,7 +830,7 @@ function handleSignup(e) {
 }
 
 // ── STRIPE + PAYMENT — only init if Stripe is available ──
-const STRIPE_PK = 'pk_live_51TKhdTCbvJQJqswjijLBBH7DqEy0mNkYLZCU2JPaL2lDk92xgiWsE5aEXb1u9R7CzA8yvN4Jf1mekgDnc0BeniRS00EielPtP6';
+const STRIPE_PK = 'pk_test_51TKhdTCbvJQJqswjro5hz6CVfKxn3aw9ET3epJQX8FARNF4gPNGREI69pWkFkBw9FrWYtXoWklLPaKMjE9bn1LiK00Z2UlOYn7';
 const API_BASE  = '/.netlify/functions';
 const MAX_TICKETS = 30;
 
@@ -850,6 +850,7 @@ let cardElement    = null;
 // ── TICKET COUNTER ────────────────────────────────────
 let ticketsRemaining = MAX_TICKETS;
 let isSoldOut = false;
+let bedInventory = {twin:9, double:1, dbl_pvt:1, king:2, none:99};
 
 async function loadTicketCount() {
   try {
@@ -858,9 +859,9 @@ async function loadTicketCount() {
     const data = await res.json();
     ticketsRemaining = data.remaining;
     isSoldOut = data.soldOut;
+    if (data.beds) bedInventory = data.beds;
     updateCounterUI(data.remaining, data.soldOut);
   } catch(e) {
-    // Not deployed yet — show default, non-blocking
     updateCounterUI(MAX_TICKETS, false);
   }
 }
@@ -954,15 +955,21 @@ function renderModal(){
     inner+=`
       <div style="font-family:var(--serif);font-size:19px;color:var(--f);margin-bottom:5px">Choose Your Bed</div>
       <p style="font-size:12px;color:var(--wg);margin-bottom:16px;font-weight:300">Bathrooms are community-style. Select your sleeping arrangement.</p>
-      <div class="bed-list">${BEDS.map(b=>`
-        <div class="bed-item${selBed===b.id?' selected':''}" onclick="selBed='${b.id}';renderModal()">
+      <div class="bed-list">${BEDS.map(b=>{
+        const avail = bedInventory[b.id] !== undefined ? bedInventory[b.id] : b.slots;
+        const soldOut = avail <= 0 && b.id !== 'none';
+        const isSelected = selBed === b.id;
+        const clickHandler = soldOut ? '' : `onclick="selBed='${b.id}';renderModal()"`;
+        return `
+        <div class="bed-item${isSelected?' selected':''}${soldOut?' disabled':''}" ${clickHandler} style="${soldOut?'opacity:.4;cursor:not-allowed;':'cursor:pointer;'}">
           <div class="bed-icon-el">${b.icon}</div>
           <div class="bed-info">
-            <div class="bed-name-el">${b.name}${b.slots<5?`<span class="bed-avail">(${b.slots} avail.)</span>`:''}</div>
+            <div class="bed-name-el">${b.name}${soldOut?`<span class="bed-avail" style="color:#c0392b;"> (Sold Out)</span>`:avail<5&&b.id!=='none'?`<span class="bed-avail">(${avail} left)</span>`:''}</div>
             <div class="bed-desc-el">${b.desc}</div>
           </div>
-          <div class="bed-right">${b.price>0?`<div class="bed-price-el">+$${b.price}</div><div class="bed-dep-el">or +$${b.dep} dep.</div>`:`<div class="bed-free">No charge</div>`}</div>
-        </div>`).join('')}</div>
+          <div class="bed-right">${soldOut?`<div style="font-size:11px;color:#c0392b;font-weight:500;text-transform:uppercase;letter-spacing:.06em">Sold Out</div>`:b.price>0?`<div class="bed-price-el">+$${b.price}</div><div class="bed-dep-el">or +$${b.dep} dep.</div>`:`<div class="bed-free">No charge</div>`}</div>
+        </div>`;
+      }).join('')}</div>
       <div class="modal-nav"><button class="btn-back" onclick="step=1;renderModal()">← Back</button><button class="btn-forest" ${!selBed?'disabled':''} onclick="step=3;renderModal()">Continue →</button></div>`;
   }
   else if(step===3){
